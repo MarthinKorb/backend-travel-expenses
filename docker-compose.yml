@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: backend_travel_expenses_DB
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: backend_travel_expenses_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+
+networks:
+  backend_network:

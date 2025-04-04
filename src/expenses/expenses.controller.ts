@@ -28,7 +28,7 @@ export class ExpensesController {
   @Get()
   findAll(@Request() req) {
     const userId = req.user.id;
-    return this.expensesService.findAll(userId);
+    return this.expensesService.findAll(+userId);
   }
 
   @Get(':id')

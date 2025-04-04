@@ -23,7 +23,7 @@ export class Expense {
   @Column()
   description: string;
 
-  @Column('decimal')
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;
 
   @Column()
@@ -40,7 +40,7 @@ export class Expense {
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
-  @ManyToOne(() => Trip, (trip) => trip.expenses, { nullable: true })
+  @ManyToOne(() => Trip, (trip) => trip.expenses)
   @JoinColumn({ name: 'trip_id' })
   trip: Trip;
 

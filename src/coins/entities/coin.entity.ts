@@ -19,6 +19,9 @@ export class Coin {
   @Column()
   symbol: string;
 
+  @Column()
+  code: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

@@ -1,4 +1,12 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 
@@ -20,5 +28,12 @@ export class AuthController {
     @Body() body: { email: string; name: string; password: string },
   ) {
     return this.usersService.create(body);
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  getMyself(@Request() req) {
+    const idUser = Number.parseInt(req.user.id);
+    return this.usersService.findById(idUser, idUser);
   }
 }

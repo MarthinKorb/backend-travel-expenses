@@ -37,6 +37,7 @@ export class CategoriesService {
   async findAll(userId: number): Promise<Category[]> {
     return this.categoriesRepository.find({
       where: { user: { id: userId } },
+      order: { description: 'asc' },
     });
   }
 

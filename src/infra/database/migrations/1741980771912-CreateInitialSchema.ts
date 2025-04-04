@@ -51,6 +51,7 @@ export class CreateInitialSchema1741980771912 implements MigrationInterface {
           },
           { name: 'name', type: 'varchar' },
           { name: 'symbol', type: 'varchar' },
+          { name: 'code', type: 'varchar' },
           {
             name: 'created_at',
             type: 'timestamp',

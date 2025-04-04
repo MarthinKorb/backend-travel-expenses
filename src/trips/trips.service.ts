@@ -22,7 +22,10 @@ export class TripsService {
 
   async findAll(userId: number): Promise<Trip[]> {
     console.log(userId);
-    return await this.tripRepository.find({ where: { user: { id: userId } } });
+    return await this.tripRepository.find({
+      where: { user: { id: userId } },
+      order: { startDate: 'desc' },
+    });
   }
 
   async findOne(id: number, userId: number): Promise<Trip> {

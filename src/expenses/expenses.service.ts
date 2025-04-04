@@ -34,6 +34,7 @@ export class ExpensesService {
     return await this.expenseRepository.find({
       where: { trip: { id: tripId }, user: { id: userId } },
       relations: ['coin', 'category'],
+      order: { date: 'desc' },
     });
   }
 

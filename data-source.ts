@@ -15,6 +15,8 @@ export const AppDataSource = new DataSource({
   migrations: [__dirname + '/**/database/migrations/*{.ts,.js}'],
   synchronize: false,
   logging: true,
+  // APenas em PROD
+  // ssl: { rejectUnauthorized: true },
 });
 
 // npm run build

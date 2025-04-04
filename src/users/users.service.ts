@@ -33,6 +33,22 @@ export class UsersService {
   }
 
   async create(userData: Partial<User>): Promise<User> {
+    const existingUser = await this.findByEmail(userData.email);
+    if (existingUser) {
+      throw new Error('E-mail já cadastrado');
+    }
+    if (!userData.name || userData.name.trim() === '') {
+      throw new Error('Nome é obrigatório');
+    }
+    if (!userData.email || userData.email.trim() === '') {
+      throw new Error('E-mail é obrigatório');
+    }
+    if (!userData.password || userData.password.trim() === '') {
+      throw new Error('Senha é obrigatória');
+    }
+    if (userData.password.length < 6) {
+      throw new Error('Senha deve ter pelo menos 6 caracteres');
+    }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(userData.password, salt);
     userData.password = hashedPassword;

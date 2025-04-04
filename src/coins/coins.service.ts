@@ -18,7 +18,7 @@ export class CoinsService {
   }
 
   async findAll(userId: number): Promise<Coin[]> {
-    return await this.coinRepository.find();
+    return await this.coinRepository.find({ order: { name: 'asc' } });
   }
 
   async findOne(id: number, userId: number): Promise<Coin> {

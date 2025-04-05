@@ -1,11 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { toLocalDateOnly } from 'src/shared/date-utils';
-import { Trip } from 'src/trips/entities/trip.entity';
 import { Repository } from 'typeorm';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
@@ -16,16 +10,12 @@ export class ExpensesService {
   constructor(
     @InjectRepository(Expense)
     private readonly expenseRepository: Repository<Expense>,
-    @InjectRepository(Trip)
-    private readonly tripRepository: Repository<Trip>,
   ) {}
 
   async create(
     createExpenseDto: CreateExpenseDto,
     userId: number,
   ): Promise<Expense> {
-    await this.validateExpenseDate(createExpenseDto);
-
     const expense = this.expenseRepository.create({
       ...createExpenseDto,
       user: { id: userId },
@@ -64,7 +54,6 @@ export class ExpensesService {
     if (!expense) {
       throw new NotFoundException('Expense not found');
     }
-    await this.validateExpenseDate(updateExpenseDto);
     await this.expenseRepository.update(id, updateExpenseDto);
     return this.findOne(id, userId);
   }
@@ -75,37 +64,5 @@ export class ExpensesService {
       throw new NotFoundException('Despensa não encontrada');
     }
     await this.expenseRepository.delete({ id, user: { id: userId } });
-  }
-
-  private async validateExpenseDate(
-    expense: CreateExpenseDto | UpdateExpenseDto,
-  ) {
-    const trip = await this.tripRepository.findOne({
-      where: { id: expense.trip.id },
-    });
-
-    if (!trip) {
-      throw new NotFoundException('Viagem não encontrada');
-    }
-
-    const expenseDate = toLocalDateOnly(expense.date);
-    const tripStart = toLocalDateOnly(trip.startDate);
-    const tripEnd = toLocalDateOnly(trip.endDate);
-
-    console.log(expense.date);
-    console.log(trip.startDate);
-    console.log(trip.endDate);
-
-    if (expenseDate > tripEnd) {
-      throw new BadRequestException(
-        'A data da despesa não pode ser posterior ao fim da viagem',
-      );
-    }
-
-    if (expenseDate < tripStart) {
-      throw new BadRequestException(
-        'A data da despesa não pode ser anterior ao início da viagem',
-      );
-    }
   }
 }

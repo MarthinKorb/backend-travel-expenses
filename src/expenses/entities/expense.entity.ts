@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { Coin } from '../../coins/entities/coin.entity';
+import { PaymentMethod } from '../../payment-method/entities/payment-method.entity';
 import { Trip } from '../../trips/entities/trip.entity';
 import { User } from '../../users/entities/user.entity';
 
@@ -25,9 +26,6 @@ export class Expense {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;
-
-  @Column()
-  payment_method: string;
 
   @Column({ type: 'text', nullable: true })
   notes: string | null;
@@ -47,6 +45,10 @@ export class Expense {
   @ManyToOne(() => User, (user) => user.expenses)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.expenses)
+  @JoinColumn({ name: 'payment_method_id' })
+  paymentMethod: PaymentMethod;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;

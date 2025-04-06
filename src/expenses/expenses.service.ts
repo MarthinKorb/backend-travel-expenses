@@ -26,14 +26,14 @@ export class ExpensesService {
   async findAll(userId: number): Promise<Expense[]> {
     return await this.expenseRepository.find({
       where: { user: { id: userId } },
-      relations: ['coin', 'category'],
+      relations: ['coin', 'category', 'paymentMethod'],
     });
   }
 
   async findAllByTripId(tripId: number, userId: number): Promise<Expense[]> {
     return await this.expenseRepository.find({
       where: { trip: { id: tripId }, user: { id: userId } },
-      relations: ['coin', 'category'],
+      relations: ['coin', 'category', 'paymentMethod'],
       order: { date: 'desc' },
     });
   }
@@ -41,7 +41,7 @@ export class ExpensesService {
   async findOne(id: number, userId: number): Promise<Expense> {
     return await this.expenseRepository.findOne({
       where: { id, user: { id: userId } },
-      relations: ['coin', 'category'],
+      relations: ['coin', 'category', 'paymentMethod'],
     });
   }
 

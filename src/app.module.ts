@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CoinsModule } from './coins/coins.module';
 import { ExpensesModule } from './expenses/expenses.module';
+import { PaymentMethodModule } from './payment-method/payment-method.module';
 import { TripsModule } from './trips/trips.module';
 import { UsersModule } from './users/users.module';
 
@@ -21,6 +22,7 @@ import { UsersModule } from './users/users.module';
     TripsModule,
     UsersModule,
     AuthModule,
+    PaymentMethodModule,
   ],
 })
 export class AppModule {}

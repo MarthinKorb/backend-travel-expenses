@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { Expense } from '../../expenses/entities/expense.entity';
+import { PaymentMethod } from '../../payment-method/entities/payment-method.entity';
 import { Trip } from '../../trips/entities/trip.entity';
 
 @Entity('users')
@@ -25,6 +26,9 @@ export class User {
 
   @OneToMany(() => Expense, (expense) => expense.user)
   expenses: Expense[];
+
+  @OneToMany(() => PaymentMethod, (paymentMethod) => paymentMethod.user)
+  paymentMethod: PaymentMethod[];
 
   @Column({ name: 'created_at', type: 'timestamp', default: () => 'now()' })
   createdAt: Date;

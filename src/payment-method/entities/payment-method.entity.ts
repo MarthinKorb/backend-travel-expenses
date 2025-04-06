@@ -11,17 +11,13 @@ import {
 import { Expense } from '../../expenses/entities/expense.entity';
 import { User } from '../../users/entities/user.entity';
 
-@Entity('categories')
-export class Category {
+@Entity('payment_methods')
+export class PaymentMethod {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   description: string;
-
-  @ManyToOne(() => User, (user) => user.categories)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
@@ -31,4 +27,8 @@ export class Category {
 
   @OneToMany(() => Expense, (expense) => expense.user)
   expenses: Expense[];
+
+  @ManyToOne(() => User, (user) => user.categories)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }

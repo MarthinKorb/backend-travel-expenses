@@ -23,6 +23,7 @@ export class PaymentMethodService {
   findAll(userId: number) {
     return this.paymentMethodRepository.find({
       where: { user: { id: userId } },
+      order: { description: 'asc' },
     });
   }
 

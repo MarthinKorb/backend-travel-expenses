@@ -52,4 +52,13 @@ export class ExpensesController {
     const userId = req.user.id;
     return this.expensesService.remove(+id, userId);
   }
+
+  @Get('/trip/:id/resume-by-category')
+  async findResumeByCategory(@Request() req, @Param('id') tripId: number) {
+    const userId = req.user.id;
+    return await this.expensesService.getExpenseResumeByCategory(
+      userId,
+      tripId,
+    );
+  }
 }

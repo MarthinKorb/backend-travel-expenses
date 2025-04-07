@@ -21,10 +21,22 @@ export class TripsService {
   }
 
   async findAll(userId: number): Promise<Trip[]> {
-    return await this.tripRepository.find({
-      where: { user: { id: userId } },
-      order: { startDate: 'desc' },
-    });
+    const trips = await this.tripRepository
+      .createQueryBuilder('trip')
+      .leftJoin('trip.expenses', 'expense')
+      .select('SUM(expense.amount)', 'totalExpenses')
+      .addSelect('trip.id', 'id')
+      .addSelect('trip.name', 'name')
+      .addSelect('trip.startDate', 'startDate')
+      .addSelect('trip.endDate', 'endDate')
+      .where('trip.user_id = :userId', { userId })
+      .groupBy('trip.id')
+      .addGroupBy('trip.name')
+      .addGroupBy('trip.startDate')
+      .addGroupBy('trip.endDate')
+      .orderBy('trip.startDate', 'DESC')
+      .getRawMany();
+    return trips;
   }
 
   async findOne(id: number, userId: number): Promise<Trip> {

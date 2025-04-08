@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
+import { Status } from '../../enums/status-enum';
 import { Expense } from '../../expenses/entities/expense.entity';
 import { PaymentMethod } from '../../payment-method/entities/payment-method.entity';
 import { Trip } from '../../trips/entities/trip.entity';
@@ -17,6 +18,13 @@ export class User {
 
   @Column({ select: false })
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: Status,
+    default: Status.ACTIVE,
+  })
+  status: Status;
 
   @OneToMany(() => Trip, (trip) => trip.user)
   trips: Trip[];

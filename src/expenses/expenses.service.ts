@@ -67,7 +67,7 @@ export class ExpensesService {
     await this.expenseRepository.delete({ id, user: { id: userId } });
   }
 
-  async getExpenseResumeByCategory(
+  async getExpenseSummaryByCategory(
     userId: number,
     tripId: number,
   ): Promise<any> {

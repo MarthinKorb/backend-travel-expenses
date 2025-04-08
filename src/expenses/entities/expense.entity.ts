@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { Coin } from '../../coins/entities/coin.entity';
+import { Status } from '../../enums/status-enum';
 import { PaymentMethod } from '../../payment-method/entities/payment-method.entity';
 import { Trip } from '../../trips/entities/trip.entity';
 import { User } from '../../users/entities/user.entity';
@@ -30,8 +31,15 @@ export class Expense {
   @Column({ type: 'text', nullable: true })
   notes: string | null;
 
+  @Column({
+    type: 'enum',
+    enum: Status,
+    default: Status.ACTIVE,
+  })
+  status: Status;
+
   @ManyToOne(() => Coin, (coin) => coin.expenses)
-  @JoinColumn({ name: 'currency_id' })
+  @JoinColumn({ name: 'coin_id' })
   coin: Coin;
 
   @ManyToOne(() => Category, (category) => category.expenses)

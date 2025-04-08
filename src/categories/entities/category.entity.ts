@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Status } from '../../enums/status-enum';
 import { Expense } from '../../expenses/entities/expense.entity';
 import { User } from '../../users/entities/user.entity';
 
@@ -18,6 +19,13 @@ export class Category {
 
   @Column()
   description: string;
+
+  @Column({
+    type: 'enum',
+    enum: Status,
+    default: Status.ACTIVE,
+  })
+  status: Status;
 
   @ManyToOne(() => User, (user) => user.categories)
   @JoinColumn({ name: 'user_id' })

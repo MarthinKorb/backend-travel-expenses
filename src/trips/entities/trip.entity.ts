@@ -19,10 +19,10 @@ export class Trip {
   @Column()
   name: string;
 
-  @Column({ type: 'date' })
+  @Column({ name: 'start_date', type: 'date' })
   startDate: Date;
 
-  @Column({ type: 'date' })
+  @Column({ name: 'end_date', type: 'date' })
   endDate: Date;
 
   @ManyToOne(() => User, (user) => user.trips)

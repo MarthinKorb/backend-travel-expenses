@@ -1,6 +1,6 @@
 import { Category } from 'src/categories/entities/category.entity';
-import { Coin } from 'src/coins/entities/coin.entity';
-import { Trip } from 'src/trips/entities/trip.entity';
+import { Coin } from '../../coins/entities/coin.entity';
+import { Trip } from '../../trips/entities/trip.entity';
 
 export class CreateExpenseDto {
   id: number;

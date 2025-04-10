@@ -80,6 +80,8 @@ export class ExpensesService {
       .where('expense.trip_id = :tripId', { tripId })
       .andWhere('expense.user_id = :userId', { userId })
       .groupBy('category.id')
+      .orderBy('total', 'DESC')
+      .addOrderBy('category.description', 'ASC')
       .getRawMany();
 
     const totalAmount = result.reduce(

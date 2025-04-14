@@ -1,4 +1,5 @@
 import {
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -38,6 +39,17 @@ export class Expense {
   })
   status: Status;
 
+  @CreateDateColumn({ type: 'timestamp' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updated_at: Date;
+
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updated_at = new Date();
+  }
+
   @ManyToOne(() => Coin, (coin) => coin.expenses)
   @JoinColumn({ name: 'coin_id' })
   coin: Coin;
@@ -57,10 +69,4 @@ export class Expense {
   @ManyToOne(() => PaymentMethod, (paymentMethod) => paymentMethod.expenses)
   @JoinColumn({ name: 'payment_method_id' })
   paymentMethod: PaymentMethod;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
-
-  @UpdateDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP' })
-  updated_at: Date;
 }

@@ -1,4 +1,6 @@
+import { Status } from 'src/enums/status-enum';
 import {
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -25,6 +27,13 @@ export class Trip {
   @Column({ name: 'end_date', type: 'date' })
   endDate: Date;
 
+  @Column({
+    type: 'enum',
+    enum: Status,
+    default: Status.ACTIVE,
+  })
+  status: Status;
+
   @ManyToOne(() => User, (user) => user.trips)
   @JoinColumn({ name: 'user_id' })
   user: User;
@@ -34,6 +43,11 @@ export class Trip {
 
   @UpdateDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updated_at = new Date();
+  }
 
   @OneToMany(() => Expense, (expense) => expense.trip)
   expenses: Expense[];

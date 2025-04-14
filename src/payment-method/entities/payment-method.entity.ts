@@ -1,4 +1,5 @@
 import {
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -30,10 +31,15 @@ export class PaymentMethod {
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 
-  @OneToMany(() => Expense, (expense) => expense.user)
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updated_at = new Date();
+  }
+
+  @OneToMany(() => Expense, (expense) => expense.paymentMethod)
   expenses: Expense[];
 
   @ManyToOne(() => User, (user) => user.categories)

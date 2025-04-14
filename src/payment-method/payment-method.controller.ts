@@ -24,7 +24,6 @@ export class PaymentMethodController {
     @Request() req,
     @Body() createPaymentMethodDto: CreatePaymentMethodDto,
   ) {
-    console.log('createPaymentMethodDto', createPaymentMethodDto);
     return this.paymentMethodService.create(
       req.user.id,
       createPaymentMethodDto,

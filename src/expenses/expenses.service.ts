@@ -55,8 +55,11 @@ export class ExpensesService {
     if (!expense) {
       throw new NotFoundException('Expense not found');
     }
-    await this.expenseRepository.update(id, updateExpenseDto);
-    return this.findOne(id, userId);
+    return await this.expenseRepository.save({
+      id,
+      ...updateExpenseDto,
+      user: { id: userId },
+    });
   }
 
   async remove(id: number, userId: number): Promise<void> {

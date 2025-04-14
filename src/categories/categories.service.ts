@@ -59,11 +59,11 @@ export class CategoriesService {
       throw new Error('User not found');
     }
 
-    await this.categoriesRepository.update(
-      { id, user: { id: userId } },
-      updateCategoryDto,
-    );
-    return this.findOne(id, userId);
+    return await this.categoriesRepository.save({
+      id,
+      ...updateCategoryDto,
+      user: { id: userId },
+    });
   }
 
   // Método para remover uma categoria, filtrando pelo userId

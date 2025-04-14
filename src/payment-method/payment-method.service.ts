@@ -38,11 +38,15 @@ export class PaymentMethodService {
     id: number,
     updatePaymentMethodDto: UpdatePaymentMethodDto,
   ) {
-    const paymentMethod = this.paymentMethodRepository.findOneBy({ id });
+    const paymentMethod = this.paymentMethodRepository.findOneBy({
+      id,
+      user: { id: userId },
+    });
     if (!paymentMethod) {
       throw new NotFoundException('Payment method not found');
     }
-    return this.paymentMethodRepository.update(id, {
+    return this.paymentMethodRepository.save({
+      id,
       ...updatePaymentMethodDto,
       user: { id: userId },
     });

@@ -29,6 +29,7 @@ export class TripsService {
       .addSelect('trip.name', 'name')
       .addSelect('trip.startDate', 'startDate')
       .addSelect('trip.endDate', 'endDate')
+      .addSelect('trip.status', 'status')
       .where('trip.user_id = :userId', { userId })
       .groupBy('trip.id')
       .addGroupBy('trip.name')
@@ -63,7 +64,7 @@ export class TripsService {
     });
 
     if (!updatedTrip) {
-      throw new NotFoundException(`Trip with ID ${id} not found`);
+      throw new NotFoundException(`Registro ${id} não encontrado`);
     }
 
     return await this.tripRepository.save(updatedTrip);

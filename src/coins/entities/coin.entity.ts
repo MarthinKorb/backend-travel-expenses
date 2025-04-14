@@ -1,4 +1,5 @@
 import {
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -35,6 +36,11 @@ export class Coin {
 
   @UpdateDateColumn({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  @BeforeUpdate()
+  updateTimestamp() {
+    this.updated_at = new Date();
+  }
 
   @OneToMany(() => Expense, (expense) => expense.coin)
   expenses: Expense[];

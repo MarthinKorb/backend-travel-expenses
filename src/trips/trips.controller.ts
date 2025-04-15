@@ -6,11 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ExpensesService } from '../../src/expenses/expenses.service';
+import { PaginationQueryDto } from '../shared/pagination/pagination-query.dto';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { TripsService } from './trips.service';
@@ -29,8 +31,8 @@ export class TripsController {
   }
 
   @Get()
-  findAll(@Request() req) {
-    return this.tripsService.findAll(req.user.id);
+  findAll(@Request() req, @Query() pagination: PaginationQueryDto) {
+    return this.tripsService.findAll(req.user.id, pagination);
   }
 
   @Get('/:tripId/expenses')

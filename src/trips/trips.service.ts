@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Paginated } from 'src/shared/pagination/paginate';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from '../../src/shared/pagination/pagination-query.dto';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { Trip } from './entities/trip.entity';
@@ -20,24 +22,102 @@ export class TripsService {
     return await this.tripRepository.save(trip);
   }
 
-  async findAll(userId: number): Promise<Trip[]> {
-    const trips = await this.tripRepository
+  async findAll(
+    userId: number,
+    pagination: PaginationQueryDto,
+  ): Promise<Paginated<Trip>> {
+    const page =
+      Number.isInteger(+pagination.page) && +pagination.page > 0
+        ? +pagination.page
+        : 1;
+    const limit =
+      Number.isInteger(+pagination.limit) && +pagination.limit > 0
+        ? +pagination.limit
+        : 10;
+    const offset = (page - 1) * limit;
+
+    const tripIdsQb = this.tripRepository
+      .createQueryBuilder('trip')
+      .select('trip.id')
+      .where('trip.user_id = :userId', { userId })
+      .orderBy('trip.startDate', 'DESC')
+      .skip(offset)
+      .take(limit);
+
+    const tripIds = await tripIdsQb.getRawMany();
+
+    const ids = tripIds.map((row) => row.trip_id || row.id);
+
+    if (ids.length === 0) {
+      return {
+        items: [],
+        meta: {
+          totalItems: 0,
+          itemCount: 0,
+          itemsPerPage: limit,
+          totalPages: 0,
+          currentPage: page,
+        },
+        links: {
+          first: `${process.env.BASE_URL}?page=1&limit=${limit}`,
+          previous: null,
+          next: null,
+          last: `${process.env.BASE_URL}?page=1&limit=${limit}`,
+        },
+      };
+    }
+
+    const tripsQb = this.tripRepository
       .createQueryBuilder('trip')
       .leftJoin('trip.expenses', 'expense')
-      .select('SUM(expense.amount)', 'totalExpenses')
-      .addSelect('trip.id', 'id')
+      .select('trip.id', 'id')
       .addSelect('trip.name', 'name')
       .addSelect('trip.startDate', 'startDate')
       .addSelect('trip.endDate', 'endDate')
       .addSelect('trip.status', 'status')
-      .where('trip.user_id = :userId', { userId })
+      .addSelect('SUM(expense.amount)', 'totalExpenses')
+      .where('trip.id IN (:...ids)', { ids })
       .groupBy('trip.id')
       .addGroupBy('trip.name')
       .addGroupBy('trip.startDate')
       .addGroupBy('trip.endDate')
-      .orderBy('trip.startDate', 'DESC')
-      .getRawMany();
-    return trips;
+      .addGroupBy('trip.status')
+      .orderBy('trip.startDate', 'DESC');
+
+    const items = await tripsQb.getRawMany();
+
+    // Total de registros (sem paginação)
+    const totalItemsResult = await this.tripRepository
+      .createQueryBuilder('trip')
+      .where('trip.user_id = :userId', { userId })
+      .getCount();
+
+    const totalPages = Math.ceil(totalItemsResult / limit);
+
+    const links = {
+      first: `${process.env.BASE_URL}?page=1&limit=${limit}`,
+      previous:
+        page > 1
+          ? `${process.env.BASE_URL}?page=${page - 1}&limit=${limit}`
+          : null,
+      next:
+        page < totalPages
+          ? `${process.env.BASE_URL}?page=${page + 1}&limit=${limit}`
+          : null,
+      last: `${process.env.BASE_URL}?page=${totalPages}&limit=${limit}`,
+    };
+
+    return {
+      items,
+      meta: {
+        totalItems: totalItemsResult,
+        itemCount: items.length,
+        itemsPerPage: limit,
+        totalPages,
+        currentPage: page,
+      },
+      links,
+    };
   }
 
   async findOne(id: number, userId: number): Promise<Trip> {

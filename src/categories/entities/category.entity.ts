@@ -9,6 +9,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { IncomeOutcomeType } from '../../enums/income-outcome-type-enum';
 import { Status } from '../../enums/status-enum';
 import { Expense } from '../../expenses/entities/expense.entity';
 import { User } from '../../users/entities/user.entity';
@@ -27,6 +29,13 @@ export class Category {
     default: Status.ACTIVE,
   })
   status: Status;
+
+  @Column({
+    type: 'enum',
+    enum: IncomeOutcomeType,
+    default: IncomeOutcomeType.OUTCOME,
+  })
+  type: IncomeOutcomeType;
 
   @ManyToOne(() => User, (user) => user.categories)
   @JoinColumn({ name: 'user_id' })

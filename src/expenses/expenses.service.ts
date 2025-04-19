@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { IncomeOutcomeType } from '../enums/income-outcome-type-enum';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { ExpenseResumeByCategoryDto } from './dto/expense-resume-by-category.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
@@ -79,6 +80,7 @@ export class ExpensesService {
       .innerJoin('expense.category', 'category')
       .select('category.id', 'id')
       .addSelect('category.description', 'description')
+      .addSelect('category.type', 'type')
       .addSelect('SUM(expense.amount)', 'total')
       .where('expense.trip_id = :tripId', { tripId })
       .andWhere('expense.user_id = :userId', { userId })
@@ -87,18 +89,40 @@ export class ExpensesService {
       .addOrderBy('category.description', 'ASC')
       .getRawMany();
 
-    const totalAmount = result.reduce(
-      (acc, curr) => acc + parseFloat(curr.total),
-      0,
+    const [totalAmountIncomes, totalAmountOutcomes] = result.reduce(
+      (acc, curr) => {
+        if (curr.type === IncomeOutcomeType.INCOME) {
+          acc[0] += parseFloat(curr.total);
+        } else if (curr.type === IncomeOutcomeType.OUTCOME) {
+          acc[1] += parseFloat(curr.total);
+        }
+        return acc;
+      },
+      [0, 0],
     );
 
-    const data = result.map<ExpenseResumeByCategoryDto>((item) => ({
-      category: item.description,
-      total: parseFloat(item.total),
-      percentage: parseFloat(
-        ((parseFloat(item.total) / totalAmount) * 100).toFixed(2),
-      ),
-    }));
-    return { data, totalAmount };
+    const incomes = result
+      .filter((item) => item.type === IncomeOutcomeType.INCOME)
+      .map<ExpenseResumeByCategoryDto>((item) => ({
+        category: item.description,
+        total: parseFloat(item.total),
+        type: item.type,
+        percentage: parseFloat(
+          ((parseFloat(item.total) / totalAmountIncomes) * 100).toFixed(2),
+        ),
+      }));
+
+    const outcomes = result
+      .filter((item) => item.type === IncomeOutcomeType.OUTCOME)
+      .map<ExpenseResumeByCategoryDto>((item) => ({
+        category: item.description,
+        total: parseFloat(item.total),
+        type: item.type,
+        percentage: parseFloat(
+          ((parseFloat(item.total) / totalAmountOutcomes) * 100).toFixed(2),
+        ),
+      }));
+
+    return { incomes, outcomes, totalAmountIncomes, totalAmountOutcomes };
   }
 }

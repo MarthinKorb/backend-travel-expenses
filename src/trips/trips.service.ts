@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Paginated } from 'src/shared/pagination/paginate';
 import { Repository } from 'typeorm';
 import { PaginationQueryDto } from '../../src/shared/pagination/pagination-query.dto';
+import { IncomeOutcomeType } from '../enums/income-outcome-type-enum';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { Trip } from './entities/trip.entity';
@@ -26,14 +27,8 @@ export class TripsService {
     userId: number,
     pagination: PaginationQueryDto,
   ): Promise<Paginated<Trip>> {
-    const page =
-      Number.isInteger(+pagination.page) && +pagination.page > 0
-        ? +pagination.page
-        : 1;
-    const limit =
-      Number.isInteger(+pagination.limit) && +pagination.limit > 0
-        ? +pagination.limit
-        : 10;
+    const page = +pagination.page || 1;
+    const limit = +pagination.limit || 10;
     const offset = (page - 1) * limit;
 
     const tripIdsQb = this.tripRepository
@@ -70,13 +65,23 @@ export class TripsService {
     const tripsQb = this.tripRepository
       .createQueryBuilder('trip')
       .leftJoin('trip.expenses', 'expense')
+      .leftJoin('expense.category', 'category')
       .select('trip.id', 'id')
       .addSelect('trip.name', 'name')
       .addSelect('trip.startDate', 'startDate')
       .addSelect('trip.endDate', 'endDate')
       .addSelect('trip.status', 'status')
-      .addSelect('SUM(expense.amount)', 'totalExpenses')
+      .addSelect(
+        'SUM(CASE WHEN category.type = :outcomeType THEN expense.amount ELSE 0 END)',
+        'totalExpenses',
+      )
+      .addSelect(
+        'SUM(CASE WHEN category.type = :incomeType THEN expense.amount ELSE 0 END)',
+        'totalIncomes',
+      )
       .where('trip.id IN (:...ids)', { ids })
+      .setParameter('outcomeType', IncomeOutcomeType.OUTCOME)
+      .setParameter('incomeType', IncomeOutcomeType.INCOME)
       .groupBy('trip.id')
       .addGroupBy('trip.name')
       .addGroupBy('trip.startDate')

@@ -1,15 +1,31 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend_travel_expenses_app
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - backend_network
+
   db:
     image: postgres:latest
     container_name: backend_travel_expenses_DB
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: backend_travel_expenses_db
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - backend_network
 
 volumes:
   db_data:
